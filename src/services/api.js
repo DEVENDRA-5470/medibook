@@ -1,5 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL 
-
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 /* =========================================================
    API REQUEST HELPER
@@ -11,6 +10,11 @@ async function request(path, options = {}) {
     : `/${path}`;
 
   const url = `${API_BASE_URL}${cleanPath}`;
+
+  console.log("[API REQUEST]", {
+    method: options.method || "GET",
+    url,
+  });
 
   const response = await fetch(url, {
     headers: {
@@ -27,6 +31,12 @@ async function request(path, options = {}) {
   } catch {
     data = {};
   }
+
+  console.log("[API RESPONSE]", {
+    status: response.status,
+    url,
+    data,
+  });
 
   if (!response.ok) {
     throw new Error(
@@ -46,15 +56,21 @@ async function request(path, options = {}) {
 export const api = {
   /* =======================================================
      HOSPITALS
-     
+
      Azure Function:
-     /api/getHospitals
-     
-     Response:
+     GET /api/getHospitals
+
+     Expected response:
+
      {
        success: true,
        count: 2,
-       hospitals: [...]
+       hospitals: [
+         {
+           hospitalId: "city-hospital-001",
+           hospitalName: "City Hospital"
+         }
+       ]
      }
   ======================================================= */
 
@@ -63,9 +79,9 @@ export const api = {
 
   /* =======================================================
      DOCTORS
-     
+
      Azure Function:
-     /api/getDoctors
+     GET /api/getDoctors
   ======================================================= */
 
   getDoctors: () =>
@@ -73,9 +89,9 @@ export const api = {
 
   /* =======================================================
      REGISTER DOCTOR
-     
+
      Azure Function:
-     /api/doctorRegister
+     POST /api/doctorRegister
   ======================================================= */
 
   registerDoctor: (payload) =>
@@ -86,9 +102,9 @@ export const api = {
 
   /* =======================================================
      PATIENTS
-     
+
      Azure Function:
-     /api/getPatients
+     GET /api/getPatients
   ======================================================= */
 
   getPatients: () =>
@@ -96,9 +112,9 @@ export const api = {
 
   /* =======================================================
      REGISTER PATIENT
-     
+
      Azure Function:
-     /api/patientRegister
+     POST /api/patientRegister
   ======================================================= */
 
   registerPatient: (payload) =>
@@ -108,23 +124,55 @@ export const api = {
     }),
 
   /* =======================================================
-     APPOINTMENTS
-     
+     BOOK APPOINTMENT
+
      Azure Function:
-     /api/appointments
+     POST /api/bookAppointment
   ======================================================= */
 
   bookAppointment: (payload) =>
-    request("/appointments", {
+    request("/bookAppointment", {
       method: "POST",
       body: JSON.stringify(payload),
     }),
 
   /* =======================================================
-     DOCTOR APPOINTMENTS
-     
+     GET ALL APPOINTMENTS
+
      Azure Function:
-     /api/doctors/{doctorId}/appointments
+     GET /api/getAppointments
+
+     Expected response from your screenshot:
+
+     {
+       success: true,
+       count: 2,
+       appointments: [
+         {
+           id: "appointment-1786866657227",
+           type: "appointment",
+           hospitalId: "city-hospital-001",
+           doctorId: "1786710157412",
+           doctorName: "Dr. Rahul Sharma",
+           patientId: "1786710821820",
+           patientName: "Dev",
+           appointmentDate: "2026-09-20",
+           appointmentTime: "10:30",
+           status: "booked",
+           createdAt: "2026-08-16T07:50:57.227Z"
+         }
+       ]
+     }
+  ======================================================= */
+
+  getAppointments: () =>
+    request("/getAppointments"),
+
+  /* =======================================================
+     GET DOCTOR APPOINTMENTS
+
+     Azure Function:
+     GET /api/doctors/{doctorId}/appointments
   ======================================================= */
 
   getDoctorAppointments: (doctorId) =>

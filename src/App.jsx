@@ -9,6 +9,7 @@ import DoctorRegister from "./pages/DoctorRegister";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import BookAppointment from "./pages/BookAppointment";
+import AllAppointments from "./pages/AllAppointments";
 
 export default function App() {
   return (
@@ -38,6 +39,13 @@ export default function App() {
             path="/patient/appointment"
             element={<BookAppointment />}
           />
+
+          <Route
+          path="/appointments"
+          element={
+            <AllAppointments />
+          }
+        />
 
           <Route path="*" element={<NotFound />} />
         </Routes>

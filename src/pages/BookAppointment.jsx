@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import {
   CalendarCheck,
@@ -15,7 +15,6 @@ import {
   ArrowRight,
   CheckCircle2,
   AlertCircle,
-  HeartPulse,
   ChevronDown,
   Loader2,
   ShieldCheck,
@@ -116,6 +115,8 @@ const FALLBACK_HOSPITALS = [
 ========================================================= */
 
 export default function BookAppointment() {
+  const navigate = useNavigate();
+
   const [form, setForm] = useState(INITIAL_FORM);
 
   const [patients, setPatients] = useState([]);
@@ -146,12 +147,6 @@ export default function BookAppointment() {
       setError("");
 
       try {
-        /*
-         * Load separately.
-         *
-         * If one API fails, the others can still load.
-         */
-
         const patientResult = await safelyLoadList(
           "patients",
           api?.getPatients,
@@ -444,13 +439,6 @@ export default function BookAppointment() {
 
   /* =======================================================
      HOSPITAL SELECT
-     
-     Supports Azure response:
-
-     {
-       hospitalId: "city-hospital-001",
-       hospitalName: "City Hospital"
-     }
   ======================================================= */
 
   function handleHospitalChange(e) {
@@ -792,11 +780,14 @@ export default function BookAppointment() {
         reason,
       });
 
-      setSuccess(
-        "Appointment booked successfully."
-      );
-
-      resetForm();
+      /*
+       * Booking succeeded.
+       *
+       * Redirect directly to the appointments page.
+       */
+      navigate("/appointments", {
+        replace: true,
+      });
     } catch (err) {
       console.error(
         "Appointment booking error:",
@@ -806,7 +797,7 @@ export default function BookAppointment() {
       setError(
         getErrorMessage(err)
       );
-    } finally {
+
       setLoading(false);
     }
   }
@@ -887,10 +878,10 @@ export default function BookAppointment() {
             </button>
 
             <Link
-              to="/"
+              to="/appointments"
               className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm font-medium text-slate-300 transition hover:border-white/20 hover:bg-white/[0.08] hover:text-white"
             >
-              Back to home
+              Appointments
 
               <ArrowRight size={16} />
 
@@ -1303,17 +1294,6 @@ export default function BookAppointment() {
                   {hospitals.map(
                     (hospital, index) => {
 
-                      /*
-                       * IMPORTANT:
-                       *
-                       * Azure returns:
-                       *
-                       * hospitalId
-                       * hospitalName
-                       *
-                       * Both are supported here.
-                       */
-
                       const id = getValue(
                         hospital,
                         [
@@ -1430,7 +1410,8 @@ export default function BookAppointment() {
                   onChange={handleChange}
                   type="time"
                   icon={
-                    <Clock3 size={18} />
+                    <Clock3 size={18}
+                  />
                   }
                   required
                 />
@@ -1635,40 +1616,6 @@ async function safelyLoadList(
 
 /* =========================================================
    NORMALIZE API RESPONSE
-
-   Supports:
-
-   []
-
-   {
-     data: []
-   }
-
-   {
-     items: []
-   }
-
-   {
-     results: []
-   }
-
-   {
-     patients: []
-   }
-
-   {
-     doctors: []
-   }
-
-   {
-     hospitals: []
-   }
-
-   {
-     success: true,
-     count: 2,
-     hospitals: []
-   }
 ========================================================= */
 
 function normalizeList(
