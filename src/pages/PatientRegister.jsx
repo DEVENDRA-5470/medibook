@@ -27,7 +27,6 @@ export default function PatientRegister() {
   function handleChange(e) {
     const { name, value } = e.target;
 
-    // Only allow numbers in phone field
     if (name === "phone") {
       const numericValue = value.replace(/\D/g, "");
 
@@ -56,6 +55,7 @@ export default function PatientRegister() {
     const email = form.email.trim();
     const phone = form.phone.trim();
 
+    // Validation
     if (!name) {
       setError("Please enter your full name.");
       return;
@@ -84,13 +84,18 @@ export default function PatientRegister() {
     try {
       setLoading(true);
 
-      await api.registerPatient({
+      // API call
+      const response = await api.registerPatient({
         name,
         email,
         phone,
       });
 
-      setSuccess("Patient account created successfully.");
+      console.log("Patient registration response:", response);
+
+      setSuccess(
+        response?.message || "Patient account created successfully."
+      );
 
       setForm({
         name: "",
@@ -98,10 +103,10 @@ export default function PatientRegister() {
         phone: "",
       });
     } catch (err) {
-      console.error(err);
+      console.error("Patient registration error:", err);
 
       setError(
-        err.message || "Unable to create patient account."
+        err?.message || "Unable to create patient account."
       );
     } finally {
       setLoading(false);
@@ -305,8 +310,6 @@ export default function PatientRegister() {
 
               </div>
 
-          
-
               {/* Error */}
               {error && (
                 <div className="mb-5 rounded-2xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm leading-5 text-red-300">
@@ -336,10 +339,7 @@ export default function PatientRegister() {
                 className="space-y-5"
               >
 
-                {/* ============================= */}
                 {/* Name */}
-                {/* ============================= */}
-
                 <FormField
                   label="Full name"
                   icon={<UserRound size={18} />}
@@ -357,10 +357,7 @@ export default function PatientRegister() {
 
                 </FormField>
 
-                {/* ============================= */}
                 {/* Email */}
-                {/* ============================= */}
-
                 <FormField
                   label="Email address"
                   icon={<Mail size={18} />}
@@ -378,10 +375,7 @@ export default function PatientRegister() {
 
                 </FormField>
 
-                {/* ============================= */}
                 {/* Phone */}
-                {/* ============================= */}
-
                 <FormField
                   label="Phone number"
                   icon={<Phone size={18} />}
@@ -405,10 +399,7 @@ export default function PatientRegister() {
 
                 </FormField>
 
-                {/* ============================= */}
                 {/* Submit */}
-                {/* ============================= */}
-
                 <button
                   type="submit"
                   disabled={loading}
