@@ -1,7 +1,18 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL 
+
+
+/* =========================================================
+   API REQUEST HELPER
+========================================================= */
 
 async function request(path, options = {}) {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const cleanPath = path.startsWith("/")
+    ? path
+    : `/${path}`;
+
+  const url = `${API_BASE_URL}${cleanPath}`;
+
+  const response = await fetch(url, {
     headers: {
       "Content-Type": "application/json",
       ...(options.headers || {}),
@@ -19,27 +30,53 @@ async function request(path, options = {}) {
 
   if (!response.ok) {
     throw new Error(
-      data.message || `API request failed: ${response.status}`
+      data?.message ||
+        data?.error ||
+        `API request failed: ${response.status}`
     );
   }
 
   return data;
 }
 
+/* =========================================================
+   API
+========================================================= */
+
 export const api = {
-  // =================================
-  // Hospitals
-  // =================================
+  /* =======================================================
+     HOSPITALS
+     
+     Azure Function:
+     /api/getHospitals
+     
+     Response:
+     {
+       success: true,
+       count: 2,
+       hospitals: [...]
+     }
+  ======================================================= */
 
   getHospitals: () =>
-    request("/hospitals"),
+    request("/getHospitals"),
 
-  // =================================
-  // Doctors
-  // =================================
+  /* =======================================================
+     DOCTORS
+     
+     Azure Function:
+     /api/getDoctors
+  ======================================================= */
 
   getDoctors: () =>
     request("/getDoctors"),
+
+  /* =======================================================
+     REGISTER DOCTOR
+     
+     Azure Function:
+     /api/doctorRegister
+  ======================================================= */
 
   registerDoctor: (payload) =>
     request("/doctorRegister", {
@@ -47,12 +84,22 @@ export const api = {
       body: JSON.stringify(payload),
     }),
 
-  // =================================
-  // Patients
-  // =================================
+  /* =======================================================
+     PATIENTS
+     
+     Azure Function:
+     /api/getPatients
+  ======================================================= */
 
   getPatients: () =>
     request("/getPatients"),
+
+  /* =======================================================
+     REGISTER PATIENT
+     
+     Azure Function:
+     /api/patientRegister
+  ======================================================= */
 
   registerPatient: (payload) =>
     request("/patientRegister", {
@@ -60,9 +107,12 @@ export const api = {
       body: JSON.stringify(payload),
     }),
 
-  // =================================
-  // Appointments
-  // =================================
+  /* =======================================================
+     APPOINTMENTS
+     
+     Azure Function:
+     /api/appointments
+  ======================================================= */
 
   bookAppointment: (payload) =>
     request("/appointments", {
@@ -70,6 +120,17 @@ export const api = {
       body: JSON.stringify(payload),
     }),
 
+  /* =======================================================
+     DOCTOR APPOINTMENTS
+     
+     Azure Function:
+     /api/doctors/{doctorId}/appointments
+  ======================================================= */
+
   getDoctorAppointments: (doctorId) =>
-    request(`/doctors/${doctorId}/appointments`),
+    request(
+      `/doctors/${encodeURIComponent(
+        doctorId
+      )}/appointments`
+    ),
 };
