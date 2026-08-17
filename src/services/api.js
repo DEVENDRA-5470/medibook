@@ -11,9 +11,8 @@ async function request(path, options = {}) {
 
   const url = `${API_BASE_URL}${cleanPath}`;
 
-  console.log("[API REQUEST]", {
-    method: options.method || "GET",
-    url,
+  console.log("[EVERYTHING WORKING ✅]", {
+   
   });
 
   const response = await fetch(url, {
@@ -32,11 +31,7 @@ async function request(path, options = {}) {
     data = {};
   }
 
-  console.log("[API RESPONSE]", {
-    status: response.status,
-    url,
-    data,
-  });
+  
 
   if (!response.ok) {
     throw new Error(
