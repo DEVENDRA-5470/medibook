@@ -12,7 +12,7 @@ export default function Navbar() {
           <span className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-500 text-slate-950">
             <CalendarDays size={21} />
           </span>
-          <span className="text-xl">Medi<span className="text-emerald-400">Book</span></span>
+          <span className="text-xl">Medi<span className="text-emerald-400">Book.1</span></span>
         </Link>
 
         <div className="hidden items-center gap-8 md:flex">
